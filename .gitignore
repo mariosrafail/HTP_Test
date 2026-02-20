@@ -1,0 +1,22 @@
+# Unity generated files
+Library/
+Temp/
+obj/
+Build/
+Builds/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.mdb
+*.opendb
+*.VC.db
+*.log
+.vs/
+.vscode/
