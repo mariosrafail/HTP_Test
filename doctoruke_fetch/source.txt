@@ -1,0 +1,4 @@
+Player page: https://www.doctoruke.com/_player/tellher.html
+MP3 source: https://www.doctoruke.com/_player/_songs/tellher.mp3
+Bytes: 2642166
+Content-Type: audio/mpeg
