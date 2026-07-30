@@ -1,0 +1,36 @@
+Player page: https://www.doctoruke.com/_player/tellher.html
+Content-Type: text/html
+Bytes: 9463
+
+References:
+https://www.doctoruke.com/_favicon/apple-icon-57x57.png
+https://www.doctoruke.com/_favicon/apple-icon-60x60.png
+https://www.doctoruke.com/_favicon/apple-icon-72x72.png
+https://www.doctoruke.com/_favicon/apple-icon-76x76.png
+https://www.doctoruke.com/_favicon/apple-icon-114x114.png
+https://www.doctoruke.com/_favicon/apple-icon-120x120.png
+https://www.doctoruke.com/_favicon/apple-icon-144x144.png
+https://www.doctoruke.com/_favicon/apple-icon-152x152.png
+https://www.doctoruke.com/_favicon/apple-icon-180x180.png
+https://www.doctoruke.com/_favicon/android-icon-192x192.png
+https://www.doctoruke.com/_favicon/favicon-32x32.png
+https://www.doctoruke.com/_favicon/favicon-96x96.png
+https://www.doctoruke.com/_favicon/favicon-16x16.png
+https://www.doctoruke.com/_player/_css/ukeaudios_min.css?v=3.0
+https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css
+https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js
+https://www.doctoruke.com/_player/_scripts/plyr_min.js
+https://www.doctoruke.com/_player/_scripts/rangetouch_min.js
+https://www.googletagmanager.com/gtag/js?id=G-STME2KBVX5
+https://www.doctoruke.com/songs.html
+https://www.doctoruke.com/_player/_img/doctoruke_logo.png
+https://www.doctoruke.com/_player/_img/doctoruke_logo_small.png
+javascript:void(0)
+https://www.doctoruke.com/_player/_img/repeat_icon.png
+https://www.doctoruke.com/_player/_songs/
+https://www.doctoruke.com/
+https://www.doctoruke.com/_player/_css/pdfstyles_min.css
+https://learningukulele.com/topsites
+https://doctoruke.com/uke1_learninguketopsites.png
+https://www.doctoruke.com/out?urlx=www.topukulelesites.com
+https://www.topukulelesites.com/button.php?u=druke&buttontype=rank
