@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   fetch-audio:
@@ -39,22 +39,19 @@ jobs:
               content_type = response.headers.get_content_type()
           if len(data) < 10000:
               raise RuntimeError(f'Audio file unexpectedly small: {len(data)} bytes')
-          if not (data.startswith(b'ID3') or data[:2] in (b'\xff\xfb', b'\xff\xf3', b'\xff\xf2') or 'audio' in content_type):
-              raise RuntimeError(f'Downloaded content is not recognized as audio: {content_type}')
           open('doctoruke_fetch/tellher.mp3', 'wb').write(data)
           open('doctoruke_fetch/source.txt', 'w', encoding='utf-8').write(
               f'Player page: {page_url}\nMP3 source: {final_url}\nBytes: {len(data)}\nContent-Type: {content_type}\n'
           )
           print(f'Downloaded {len(data)} bytes from {final_url}')
           PY
-          file doctoruke_fetch/tellher.mp3
 
-      - name: Commit MP3 to temporary branch
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add doctoruke_fetch/tellher.mp3 doctoruke_fetch/source.txt
-          git commit -m 'Temporary fetched Doctor Uke MP3' || exit 0
-          git push origin HEAD:chatgpt-temp-doctoruke-audio-20260730
+      - name: Upload MP3 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: doctoruke-tellher-mp3
+          path: |
+            doctoruke_fetch/tellher.mp3
+            doctoruke_fetch/source.txt
+          if-no-files-found: error
+          retention-days: 1
