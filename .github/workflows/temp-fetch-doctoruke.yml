@@ -1,11 +1,10 @@
 name: Temporary Doctor Uke audio fetch
 
 on:
-  push:
+  pull_request:
     branches:
-      - chatgpt-temp-doctoruke-audio-20260730
-    paths-ignore:
-      - 'doctoruke_fetch/**'
+      - main
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -56,7 +55,6 @@ jobs:
           for pattern in patterns:
               candidates.extend(re.findall(pattern, html, flags=re.I))
 
-          # Some versions of the player keep the audio reference in an external script.
           script_sources = re.findall(r'<script[^>]+src\s*=\s*["\']([^"\']+)["\']', html, flags=re.I)
           for script_src in script_sources:
               script_url = urljoin(final_page_url, script_src)
@@ -106,6 +104,6 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add doctoruke_fetch/tellher.mp3 doctoruke_fetch/source.txt
+          git add doctoruke_fetch/tellher.mp3 doctoruke_fetch/source.txt doctoruke_fetch/page.html
           git commit -m 'Temporary fetched Doctor Uke MP3'
           git push origin HEAD:chatgpt-temp-doctoruke-audio-20260730
