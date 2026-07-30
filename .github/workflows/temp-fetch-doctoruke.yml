@@ -1,0 +1,111 @@
+name: Temporary Doctor Uke audio fetch
+
+on:
+  push:
+    branches:
+      - chatgpt-temp-doctoruke-audio-20260730
+    paths-ignore:
+      - 'doctoruke_fetch/**'
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-audio:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: chatgpt-temp-doctoruke-audio-20260730
+
+      - name: Resolve and download MP3
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p doctoruke_fetch
+          python3 - <<'PY'
+          import re
+          import sys
+          import urllib.request
+          from urllib.parse import urljoin
+
+          page_url = 'https://www.doctoruke.com/_player/tellher.html'
+          headers = {
+              'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/124 Safari/537.36',
+              'Referer': 'https://www.doctoruke.com/songs.html',
+          }
+
+          def fetch(url):
+              req = urllib.request.Request(url, headers=headers)
+              with urllib.request.urlopen(req, timeout=45) as response:
+                  return response.read(), response.geturl(), response.headers.get_content_type()
+
+          html_bytes, final_page_url, _ = fetch(page_url)
+          html = html_bytes.decode('utf-8', errors='replace')
+          open('doctoruke_fetch/page.html', 'wb').write(html_bytes)
+
+          patterns = [
+              r'\bmp3\s*:\s*["\']([^"\']+\.mp3(?:\?[^"\']*)?)["\']',
+              r'<source[^>]+src\s*=\s*["\']([^"\']+\.mp3(?:\?[^"\']*)?)["\']',
+              r'<audio[^>]+src\s*=\s*["\']([^"\']+\.mp3(?:\?[^"\']*)?)["\']',
+              r'["\']([^"\']+\.mp3(?:\?[^"\']*)?)["\']',
+          ]
+
+          candidates = []
+          for pattern in patterns:
+              candidates.extend(re.findall(pattern, html, flags=re.I))
+
+          # Some versions of the player keep the audio reference in an external script.
+          script_sources = re.findall(r'<script[^>]+src\s*=\s*["\']([^"\']+)["\']', html, flags=re.I)
+          for script_src in script_sources:
+              script_url = urljoin(final_page_url, script_src)
+              try:
+                  script_bytes, final_script_url, _ = fetch(script_url)
+                  script = script_bytes.decode('utf-8', errors='replace')
+                  for pattern in patterns:
+                      for candidate in re.findall(pattern, script, flags=re.I):
+                          candidates.append(urljoin(final_script_url, candidate))
+              except Exception as exc:
+                  print(f'Warning: could not inspect {script_url}: {exc}', file=sys.stderr)
+
+          normalized = []
+          for candidate in candidates:
+              url = candidate if candidate.startswith(('http://', 'https://')) else urljoin(final_page_url, candidate)
+              if url not in normalized:
+                  normalized.append(url)
+
+          if not normalized:
+              raise RuntimeError('No MP3 reference was found in the player page or its scripts.')
+
+          errors = []
+          for audio_url in normalized:
+              try:
+                  audio_bytes, final_audio_url, content_type = fetch(audio_url)
+                  if len(audio_bytes) < 10000:
+                      raise RuntimeError(f'file is unexpectedly small ({len(audio_bytes)} bytes)')
+                  if not (audio_bytes.startswith(b'ID3') or audio_bytes[:2] in (b'\xff\xfb', b'\xff\xf3', b'\xff\xf2') or 'audio' in content_type):
+                      raise RuntimeError(f'content does not look like MP3; type={content_type}')
+                  open('doctoruke_fetch/tellher.mp3', 'wb').write(audio_bytes)
+                  open('doctoruke_fetch/source.txt', 'w', encoding='utf-8').write(
+                      f'Player page: {final_page_url}\nMP3 source: {final_audio_url}\nBytes: {len(audio_bytes)}\nContent-Type: {content_type}\n'
+                  )
+                  print(f'Downloaded {len(audio_bytes)} bytes from {final_audio_url}')
+                  break
+              except Exception as exc:
+                  errors.append(f'{audio_url}: {exc}')
+          else:
+              raise RuntimeError('MP3 candidates failed:\n' + '\n'.join(errors))
+          PY
+
+          file doctoruke_fetch/tellher.mp3
+
+      - name: Commit fetched asset to temporary branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add doctoruke_fetch/tellher.mp3 doctoruke_fetch/source.txt
+          git commit -m 'Temporary fetched Doctor Uke MP3'
+          git push origin HEAD:chatgpt-temp-doctoruke-audio-20260730
